@@ -1,61 +1,76 @@
 package academy.javapro;
 
 /**
- * CheckingAccount class extending the abstract Account class.
- * Features overdraft protection and transaction fees.
+ * Project: Banking System
+ * Class: CheckingAccount.java
+ * Author: MEHMET SOYDAN
+ * Date: 03/19/2025
+ * This class represents a checking account with overdraft protection and transaction fees.
  */
 public class CheckingAccount extends Account {
-    private final double overdraftLimit;
-    private static final double TRANSACTION_FEE = 1.5; // Fee per withdrawal
+    private double overdraftLimit;
+    private static final double TRANSACTION_FEE = 1.50; // Fixed transaction fee for withdrawals
 
     /**
      * Constructor for creating a new checking account.
      *
-     * @param accountNumber The account number
-     * @param customerName The name of the account holder
-     * @param initialBalance The initial balance
-     * @param overdraftLimit The maximum allowed overdraft
+     * @param accountNumber   The account number
+     * @param customerName    The name of the account holder
+     * @param initialBalance  The initial balance
+     * @param overdraftLimit  The overdraft limit
      */
     public CheckingAccount(String accountNumber, String customerName, double initialBalance, double overdraftLimit) {
-        super(accountNumber, customerName, initialBalance); // Call to the parent constructor
+        super(accountNumber, customerName, initialBalance);
         this.overdraftLimit = overdraftLimit;
     }
 
     /**
-     * Getter for overdraft limit.
+     * Overrides the withdraw method to implement overdraft protection and transaction fees.
      *
-     * @return The overdraft limit
-     */
-    public double getOverdraftLimit() {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    /**
-     * Sets a new overdraft limit.
-     *
-     * @param overdraftLimit The new overdraft limit
-     */
-    public void setOverdraftLimit(double overdraftLimit) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    /**
-     * Overrides the withdraw method with checking account-specific rules.
-     * Implements overdraft protection and applies transaction fees.
+     * @param amount The amount to withdraw
      */
     @Override
     public void withdraw(double amount) {
-        throw new UnsupportedOperationException("Method not implemented");
+        if (amount <= 0) {
+            System.out.println("Withdrawal amount must be positive.");
+            return;
+        }
+
+        double totalAmount = amount + TRANSACTION_FEE;
+        double availableBalance = getBalance() + overdraftLimit;
+
+        if (totalAmount > availableBalance) {
+            System.out.println("Withdrawal failed. Exceeds overdraft limit.");
+        } else {
+            setBalance(getBalance() - totalAmount);
+            logTransaction("WITHDRAWAL", amount);
+            logTransaction("FEE", TRANSACTION_FEE);
+            System.out.println("Withdrew $" + amount + " from checking account.");
+            System.out.println("Transaction fee: $" + TRANSACTION_FEE);
+            if (getBalance() < 0) {
+                System.out.println("Account is in overdraft. Current balance: $" + getBalance());
+            }
+        }
     }
 
     /**
-     * Overrides the displayInfo method to include checking account-specific information.
+     * Updates the overdraft limit.
+     *
+     * @param newLimit The new overdraft limit
+     */
+    public void setOverdraftLimit(double newLimit) {
+        this.overdraftLimit = newLimit;
+        System.out.println("Overdraft limit updated to $" + newLimit);
+    }
+
+    /**
+     * Overrides the displayInfo method to include checking account-specific details.
      */
     @Override
     public void displayInfo() {
-        super.displayInfo(); // Call to the parent method
+        super.displayInfo();
         System.out.println("Account Type: Checking Account");
-        System.out.println("Overdraft Limit: $" + String.format("%.2f", overdraftLimit));
-        System.out.println("Transaction Fee: $" + String.format("%.2f", TRANSACTION_FEE));
+        System.out.println("Overdraft Limit: $" + overdraftLimit);
+        System.out.println("Transaction Fee: $" + TRANSACTION_FEE);
     }
 }
